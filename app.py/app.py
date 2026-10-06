@@ -2,7 +2,6 @@ from datetime import datetime
 import os
 import openpyxl
 import random
-from PIL import Image as PILImage
 import streamlit as st
 
 # Configuración de la página
@@ -13,9 +12,7 @@ st.set_page_config(
 )
 
 st.title("📋 Generador de Informes QUIMDES S.A.C.")
-st.markdown(
-    "Sistema multi-plantilla unificado con persistencia de datos segura."
-)
+st.markdown("Sistema multi-plantilla para gestión de datos corporativos.")
 
 # --- RUTA DE PLANTILLAS UNIFICADAS ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -84,20 +81,8 @@ with st.form(key="form_informe"):
   observaciones = st.text_area("Descripción de Actividades", height=120)
   recomendaciones = st.text_area("Recomendaciones", height=120)
 
-  st.markdown("---")
-  st.subheader("3. 📷 Evidencia Fotográfica")
-  col_f1, col_f2 = st.columns(2)
-  with col_f1:
-    foto_antes = st.file_uploader(
-        "Subir Foto ANTES", type=["png", "jpg", "jpeg"]
-    )
-  with col_f2:
-    foto_despues = st.file_uploader(
-        "Subir Foto DESPUÉS", type=["png", "jpg", "jpeg"]
-    )
-
   submit_button = st.form_submit_button(
-      "🚀 Generar Informe con su Plantilla Exclusiva", type="primary"
+      "🚀 Generar Informe en Excel", type="primary"
   )
 
 # --- PROCESAMIENTO Y MAPEO AL HACER CLIC ---
@@ -144,37 +129,13 @@ if submit_button:
       escribir_celda(ws, "O20", recomendaciones)
       escribir_celda(ws, "P20", grado_accion)
 
-      # Directorio temporal para imágenes
-      temp_dir = os.path.join(current_dir, "temp_img")
-      os.makedirs(temp_dir, exist_ok=True)
-
-      if foto_antes is not None:
-        path_antes = os.path.join(temp_dir, "antes.jpg")
-        with open(path_antes, "wb") as f:
-          f.write(foto_antes.getbuffer())
-
-        img_a = openpyxl.drawing.image.Image(path_antes)
-        img_a.width = 300
-        img_a.height = 220
-        ws.add_image(img_a, "J49")
-
-      if foto_despues is not None:
-        path_despues = os.path.join(temp_dir, "temp_despues.jpg")
-        with open(path_despues, "wb") as f:
-          f.write(foto_despues.getbuffer())
-
-        img_d = openpyxl.drawing.image.Image(path_despues)
-        img_d.width = 300
-        img_d.height = 220
-        ws.add_image(img_d, "J66")
-
       # Guardar archivo generado
       nombre_salida = f"INFORME {n_informe} ({razon_social or 'Cliente'}).xlsx"
       wb.save(nombre_salida)
 
       st.success(
-          "¡Informe generado con éxito bajo el estándar unificado y datos"
-          " seguros!"
+          "¡Informe generado con éxito! Descárgalo y coloca tus fotos"
+          " libremente."
       )
 
       with open(nombre_salida, "rb") as f:
