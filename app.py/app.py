@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import openpyxl
 import random
+from PIL import Image as PILImage
 import streamlit as st
 
 # Configuración de la página
@@ -12,7 +13,7 @@ st.set_page_config(
 )
 
 st.title("📋 Generador de Informes QUIMDES S.A.C.")
-st.markdown("Sistema multi-plantilla para gestión de datos corporativos.")
+st.markdown("Sistema multi-plantilla con ordenamiento automático de evidencias.")
 
 # --- RUTA DE PLANTILLAS UNIFICADAS ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -81,8 +82,18 @@ with st.form(key="form_informe"):
   observaciones = st.text_area("Descripción de Actividades", height=120)
   recomendaciones = st.text_area("Recomendaciones", height=120)
 
+  st.markdown("---")
+  st.subheader("3. 📷 Evidencia Fotográfica")
+
+  # Botón para subir las fotos que se acomodarán ordenadamente en los recuadros
+  imagenes_subidas = st.file_uploader(
+      "Sube tus fotos (Se colocarán ordenadas en los recuadros de evidencia)",
+      type=["png", "jpg", "jpeg"],
+      accept_multiple_files=True,
+  )
+
   submit_button = st.form_submit_button(
-      "🚀 Generar Informe en Excel", type="primary"
+      "🚀 Generar Informe Ordenado", type="primary"
   )
 
 # --- PROCESAMIENTO Y MAPEO AL HACER CLIC ---
@@ -129,18 +140,45 @@ if submit_button:
       escribir_celda(ws, "O20", recomendaciones)
       escribir_celda(ws, "P20", grado_accion)
 
+      # Directorio temporal para imágenes
+      temp_dir = os.path.join(current_dir, "temp_img")
+      os.makedirs(temp_dir, exist_ok=True)
+
+      # Acomodo automático y ordenado en las celdas de evidencia J49 y J66
+      if imagenes_subidas:
+        celdas_evidencia = ["J49", "J66"]
+        for idx, img_file in enumerate(
+            imagenes_subidas[: len(celdas_evidencia)]
+        ):
+          path_img = os.path.join(temp_dir, f"evidencia_{idx}.jpg")
+          with open(path_img, "wb") as f:
+            f.write(img_file.getbuffer())
+
+          # Abrir y redimensionar ligeramente con PIL para asegurar tamaño compacto perfecto
+          img_pil = PILImage.open(path_img)
+          img_pil.save(path_img)
+
+          img_excel = openpyxl.drawing.image.Image(path_img)
+          img_excel.width = (
+              290  # Ancho exacto controlado para que entre en el recuadro
+          )
+          img_excel.height = (
+              210  # Alto exacto para mantener la proporción de una hoja
+          )
+          ws.add_image(img_excel, celdas_evidencia[idx])
+
       # Guardar archivo generado
       nombre_salida = f"INFORME {n_informe} ({razon_social or 'Cliente'}).xlsx"
       wb.save(nombre_salida)
 
       st.success(
-          "¡Informe generado con éxito! Descárgalo y coloca tus fotos"
-          " libremente."
+          "¡Informe generado con éxito! Las fotos se han colocado de manera"
+          " ordenada en los recuadros de evidencia."
       )
 
       with open(nombre_salida, "rb") as f:
         st.download_button(
-            label="📥 Descargar Informe Excel",
+            label="📥 Descargar Informe Excel con Evidencias",
             data=f,
             file_name=nombre_salida,
             mime=(
