@@ -1,0 +1,63 @@
+name: Comprimir y Optimizar Fotos
+
+on:
+  push:
+    paths:
+      - 'fotos_originales/**'
+
+jobs:
+  procesar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Instalar Pillow
+        run: |
+          python -m pip install --upgrade pip
+          pip install Pillow
+
+      - name: ⚙️ Ejecutar optimizador de imágenes
+        run: |
+          python -c "
+          import os
+          from PIL import Image
+
+          CARPETA_ORIGINALES = 'fotos_originales'
+          CARPETA_PROCESADAS = 'fotos_listas'
+          os.makedirs(CARPETA_PROCESADAS, exist_ok=True)
+
+          archivos = [f for f in os.listdir(CARPETA_ORIGINALES) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+          print(f'Encontradas {len(archivos)} fotos para procesar.')
+
+          for idx, archivo in enumerate(sorted(archivos), start=1):
+              ruta_entrada = os.path.join(CARPETA_ORIGINALES, archivo)
+              ruta_salida = os.path.join(CARPETA_PROCESADAS, f'evidencia_{idx}.jpg')
+              try:
+                  with Image.open(ruta_entrada) as img:
+                      img = img.convert('RGB')
+                      max_ancho = 900
+                      if img.width > max_ancho:
+                          proporcion = max_ancho / float(img.width)
+                          nuevo_alto = int(float(img.height) * proporcion)
+                          img = img.resize((max_ancho, nuevo_alto), Image.Resampling.LANCZOS)
+                      img.save(ruta_salida, 'JPEG', quality=85)
+                      print(f'Procesada: {archivo} -> evidencia_{idx}.jpg')
+              except Exception as e:
+                  print(f'Error en {archivo}: {e}')
+          "
+
+      - name: 🚀 Guardar fotos optimizadas
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Auto-optimización de fotos de evidencia"
+          branch: main
+          file_pattern: 'fotos_listas/*'
