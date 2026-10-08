@@ -20,12 +20,12 @@ st.markdown(
     "Sistema avanzado con Base de Clientes, Historial, Vista Previa y PDF."
 )
 
-# --- CARPETA DE RESPALDO PARA HISTORIAL (Punto 1) ---
+# --- CARPETA DE RESPALDO PARA HISTORIAL ---
 CARPETA_HISTORIAL = "Informes_Emitidos"
 if not os.path.exists(CARPETA_HISTORIAL):
     os.makedirs(CARPETA_HISTORIAL)
 
-# --- BASE DE DATOS DE CLIENTES FRECUENTES (Punto 2) ---
+# --- BASE DE DATOS DE CLIENTES FRECUENTES ---
 ARCHIVO_CLIENTES = "clientes.json"
 
 
@@ -87,11 +87,6 @@ tipo_servicio = st.sidebar.selectbox(
 )
 ruta_plantilla = dict_plantillas[tipo_servicio]
 
-periodicidad = st.sidebar.selectbox(
-    "Periodicidad del Servicio:",
-    ["MENSUAL", "TRIMESTRAL", "SEMESTRAL", "QUINCENAL", "ANUAL"],
-)
-
 if "n_informe" not in st.session_state:
     st.session_state.n_informe = f"{random.randint(1000, 9999)}-10-2026"
 
@@ -100,124 +95,98 @@ n_informe = st.sidebar.text_input(
 )
 fecha_servicio = st.sidebar.date_input("Fecha del Servicio", value=datetime.now())
 
-# --- TEXTOS ESTRUCTURADOS ---
+# --- TEXTOS ESTRUCTURADOS DE LAS PLANTILLAS ---
 textos_predeterminados = {
     "3D": {
         "descripcion": (
             "DESCRIPCIÓN DE ACTIVIDADES:\n"
-            "Se realizó la inspección y el servicio integrado de control de"
-            " plagas (Desinsectación, Desratización y Desinfección) conforme a"
-            " las normativas sanitarias vigentes. Se aplicó producto químico"
-            " autorizado mediante aspersión en zonas críticas, zócalos y"
-            " uniones de paredes, además de verificar y rellenar las estaciones"
-            " cebadoras para el control perimétrico de roedores.\n\n"
+            "Se realizó la inspección y el servicio integrado de control de plagas "
+            "(Desinsectación, Desratización y Desinfección) conforme a las normativas sanitarias vigentes. "
+            "Se aplicó producto químico autorizado mediante aspersión en zonas críticas, zócalos y uniones de paredes, "
+            "además de verificar y rellenar las estaciones cebadoras para el control perimétrico de roedores.\n\n"
             "ACCIONES PREVENTIVAS / CORRECTIVAS:\n"
-            "1. Mantener los pisos y superficies completamente limpios, secos y"
-            " libres de restos orgánicos.\n2. Asegurar la correcta disposición"
-            " y almacenamiento de residuos sólidos en contenedores con tapa"
-            " hermética.\n3. Continuar con el programa de saneamiento ambiental"
-            f" de forma {periodicidad} para garantizar un control continuo de"
-            " vectores."
+            "1. Mantener los pisos y superficies completamente limpios, secos y libres de restos orgánicos.\n"
+            "2. Asegurar la correcta disposición y almacenamiento de residuos sólidos en contenedores con tapa hermética.\n"
+            "3. Continuar con el programa de saneamiento ambiental de forma oportuna para garantizar un control continuo de vectores."
         ),
         "recomendaciones": (
-            f"1. Realizar limpieza y desinfección periódica de todas las"
-            f" áreas operativas y de almacenamiento.\n2. Sellar aberturas o"
-            f" rendijas que puedan servir como vía de acceso para plagas.\n3."
-            f" Mantener la periodicidad {periodicidad} en las próximas"
-            f" intervenciones."
+            "1. Realizar limpieza y desinfección periódica de todas las áreas operativas y de almacenamiento.\n"
+            "2. Sellar aberturas o rendijas que puedan servir como vía de acceso para plagas.\n"
+            "3. Mantener el programa preventivo en las próximas intervenciones."
         ),
     },
     "CAMPANA, FILTROS, DUCTO Y MOTOR": {
         "descripcion": (
             "DESCRIPCIÓN DE ACTIVIDADES:\n"
-            "Se ejecutó el servicio técnico especializado de desengrase y lavado"
-            " profundo de la campana extractora, filtros metálicos, ductos de"
-            " evacuación y motor de extracción, removiendo capas de grasa y"
-            " hollín acumulado para optimizar el tiraje del sistema.\n\n"
+            "Se ejecutó el servicio técnico especializado de desengrase y lavado profundo de la campana extractora, "
+            "filtros metálicos, ductos de evacuación y motor de extracción, removiendo capas de grasa y hollín acumulado "
+            "para optimizar el tiraje del sistema.\n\n"
             "ACCIONES PREVENTIVAS / CORRECTIVAS:\n"
-            "1. Lavado y desengrase periódico de los filtros para evitar"
-            " obstrucciones por grasa acumulada.\n2. Mantenimiento técnico"
-            f" preventivo del motor y ductos de forma {periodicidad} para"
-            " mitigar por completo los riesgos de siniestros e incendios."
+            "1. Lavado y desengrase periódico de los filtros para evitar obstrucciones por grasa acumulada.\n"
+            "2. Mantenimiento técnico preventivo del motor y ductos para mitigar por completo los riesgos de siniestros e incendios."
         ),
         "recomendaciones": (
-            "1. Evitar el funcionamiento continuo del sistema sin sus"
-            " respectivos filtros de retención.\n2. Programar las revisiones"
-            f" técnicas de manera {periodicidad}."
+            "1. Evitar el funcionamiento continuo del sistema sin sus respectivos filtros de retención.\n"
+            "2. Programar las revisiones técnicas de manera oportuna."
         ),
     },
     "DESINSECTACION": {
         "descripcion": (
             "DESCRIPCIÓN DE ACTIVIDADES:\n"
-            "Se llevó a cabo la aplicación de insecticida residual mediante"
-            " equipo de mochila manual y refuerzo con equipo motorizado en"
-            " áreas internas y perimétricas, cubriendo zócalos, rincones y"
-            " posibles refugios de insectos rastreros y voladores.\n\n"
+            "Se llevó a cabo la aplicación de insecticida residual mediante equipo de mochila manual y refuerzo "
+            "con equipo motorizado en áreas internas y perimétricas, cubriendo zócalos, rincones y posibles refugios "
+            "de insectos rastreros y voladores.\n\n"
             "ACCIONES PREVENTIVAS / CORRECTIVAS:\n"
-            "1. Evitar el lavado con agua y detergente de las zonas tratadas"
-            " durante las primeras 24 horas para asegurar la efectividad del"
-            " producto.\n2. Mantener alimentos e insumos debidamente protegidos"
-            f" y tapados.\n3. Ejecutar el control de desinsectación de forma"
-            f" {periodicidad}."
+            "1. Evitar el lavado con agua y detergente de las zonas tratadas durante las primeras 24 horas "
+            "para asegurar la efectividad del producto.\n"
+            "2. Mantener alimentos e insumos debidamente protegidos y tapados.\n"
+            "3. Ejecutar el control de desinsectación de forma regular."
         ),
         "recomendaciones": (
-            "1. Revisar constantemente el sellado de puertas y ventanas para"
-            " evitar el ingreso de insectos del exterior.\n2. Mantener la"
-            f" programación {periodicidad}."
+            "1. Revisar constantemente el sellado de puertas y ventanas para evitar el ingreso de insectos del exterior.\n"
+            "2. Mantener la programación constante del servicio."
         ),
     },
     "DESINSECTACION Y DESRATIZACION": {
         "descripcion": (
             "DESCRIPCIÓN DE ACTIVIDADES:\n"
-            "Se aplicó protocolo de control combinado, realizando aspersión de"
-            " insecticida en zonas críticas y control perimétrico de roedores"
-            " mediante cebos rodenticidas seguros instalados en estaciones"
-            " estratégicas.\n\n"
+            "Se aplicó protocolo de control combinado, realizando aspersión de insecticida en zonas críticas "
+            "y control perimétrico de roedores mediante cebos rodenticidas seguros instalados en estaciones estratégicas.\n\n"
             "ACCIONES PREVENTIVAS / CORRECTIVAS:\n"
-            "1. No manipular, mover ni obstruir las estaciones de cebado ni"
-            " las trampas instaladas.\n2. Mantener los contenedores de basura"
-            " permanentemente tapados al finalizar cada jornada.\n3. Programar"
-            f" las jornadas de control de forma {periodicidad}."
+            "1. No manipular, mover ni obstruir las estaciones de cebado ni las trampas instaladas.\n"
+            "2. Mantener los contenedores de basura permanentemente tapados al finalizar cada jornada.\n"
+            "3. Programar las jornadas de control de forma preventiva."
         ),
         "recomendaciones": (
-            "1. Sellar cualquier punto de ingreso potencial detectado en el"
-            f" perímetro.\n2. Conservar la frecuencia {periodicidad} del"
-            " servicio."
+            "1. Sellar cualquier punto de ingreso potencial detectado en el perímetro.\n"
+            "2. Conservar la frecuencia de mantenimiento del servicio."
         ),
     },
     "PRESERVANTE DE MADERA": {
         "descripcion": (
             "DESCRIPCIÓN DE ACTIVIDADES:\n"
-            "Se aplicó tratamiento con preservante químico especializado de"
-            " alta penetración en las estructuras de madera designadas,"
-            " generando una barrera protectora frente a la humedad, hongos y"
-            " plagas xilófagas (termitas y gorgojos).\n\n"
+            "Se aplicó tratamiento con preservante químico especializado de alta penetración en las estructuras de madera "
+            "designadas, generando una barrera protectora frente a la humedad, hongos y plagas xilófagas (termitas y gorgojos).\n\n"
             "ACCIONES PREVENTIVAS / CORRECTIVAS:\n"
-            "1. Evitar la exposición directa o filtraciones de agua sobre la"
-            " madera tratada durante su proceso de fijación química.\n2."
-            f" Realizar inspecciones y refuerzos de forma {periodicidad}."
+            "1. Evitar la exposición directa o filtraciones de agua sobre la madera tratada durante su proceso de fijación química.\n"
+            "2. Realizar inspecciones y refuerzos de manera oportuna."
         ),
         "recomendaciones": (
-            "1. Monitorear periódicamente el estado de las superficies de"
-            " madera ante signos de humedad o desgaste."
+            "1. Monitorear periódicamente el estado de las superficies de madera ante signos de humedad o desgaste."
         ),
     },
     "TRAMPA DE GRASA": {
         "descripcion": (
             "DESCRIPCIÓN DE ACTIVIDADES:\n"
-            "Se efectuó la succión, limpieza, desinfección y lavado integral de"
-            " la trampa de grasa, retirando sedimentos sólidos del fondo, así"
-            " como aceites y espumas saponificadas de la superficie.\n\n"
+            "Se efectuó la succión, limpieza, desinfección y lavado integral de la trampa de grasa, retirando sedimentos sólidos "
+            "del fondo, así como aceites y espumas saponificadas de la superficie.\n\n"
             "ACCIONES PREVENTIVAS / CORRECTIVAS:\n"
-            "1. Evitar completamente el arrojo de aceites de cocina usados y"
-            " residuos sólidos directamente al sistema de desagüe.\n2."
-            f" Programar la succión y mantenimiento preventivo de forma"
-            f" {periodicidad}."
+            "1. Evitar completamente el arrojo de aceites de cocina usados y residuos sólidos directamente al sistema de desagüe.\n"
+            "2. Programar la succión y mantenimiento preventivo de forma constante."
         ),
         "recomendaciones": (
-            "1. Capacitar al personal de cocina en el buen uso y desecho de"
-            " grasas y aceites residuales.\n2. Mantener el programa"
-            f" {periodicidad}."
+            "1. Capacitar al personal de cocina en el buen uso y desecho de grasas y aceites residuales.\n"
+            "2. Mantener el programa de mantenimiento preventivo."
         ),
     },
 }
@@ -229,16 +198,13 @@ textos_base = textos_predeterminados.get(
 if (
     "servicio_anterior" not in st.session_state
     or st.session_state.servicio_anterior != tipo_servicio
-    or "periodo_anterior" not in st.session_state
-    or st.session_state.periodo_anterior != periodicidad
     or "observaciones" not in st.session_state
 ):
     st.session_state.servicio_anterior = tipo_servicio
-    st.session_state.periodo_anterior = periodicidad
     st.session_state.observaciones = textos_base["descripcion"]
     st.session_state.recomendaciones = textos_base["recomendaciones"]
 
-# --- SECCIÓN 1: SELECCIÓN DE CLIENTE FRECUENTE (Punto 2) ---
+# --- SECCIÓN 1: SELECCIÓN DE CLIENTE FRECUENTE ---
 st.subheader("1. 🏢 Datos del Cliente")
 modo_cliente = st.radio(
     "Seleccionar modo:", ["Seleccionar Cliente Frecuente", "Nuevo Cliente"], horizontal=True
@@ -326,9 +292,9 @@ with col_f2:
         accept_multiple_files=True,
     )
 
-# --- VISTA PREVIA EN PANTALLA (Punto 3) ---
+# --- VISTA PREVIA EN PANTALLA ---
 with st.expander("👁️ Vista Previa del Resumen del Informe"):
-    st.write(f"**Servicio:** {tipo_servicio} ({periodicidad})")
+    st.write(f"**Servicio:** {tipo_servicio}")
     st.write(f"**Cliente:** {razon_social or '[Sin especificar]'}")
     st.write(f"**Local:** {razon_comercial or '[Sin especificar]'}")
     st.write(f"**Dirección:** {direccion or '[Sin especificar]'}")
@@ -347,14 +313,12 @@ submit_button = st.button(
 if submit_button:
     if not razon_social.strip():
         st.warning(
-            "⚠️ Por favor, ingresa la Razón Social del cliente antes de"
-            " generar el informe."
+            "⚠️ Por favor, ingresa la Razón Social del cliente antes de generar el informe."
         )
     elif not os.path.exists(ruta_plantilla):
         st.error(
-            f"⚠ No se encontró la plantilla para este servicio en la ruta:"
-            f" {ruta_plantilla}. Asegúrate de tener los archivos Excel en la"
-            f" carpeta."
+            f"⚠ No se encontró la plantilla para este servicio en la ruta: {ruta_plantilla}. "
+            f"Asegúrate de tener los archivos Excel en la carpeta."
         )
     else:
         try:
@@ -375,7 +339,7 @@ if submit_button:
                 else:
                     celda.value = valor
 
-            # Mapeo unificado estricto
+            # 1. Datos del Cliente (Basado en el formato correcto del informe de Sofa Café)
             escribir_celda(ws, "A1", f"INFORME {n_informe} | ADM-QUIMDES")
             escribir_celda(ws, "B5", razon_social)
             escribir_celda(ws, "N5", razon_comercial)
@@ -384,13 +348,27 @@ if submit_button:
             escribir_celda(ws, "B7", ruc)
             escribir_celda(ws, "N7", correo)
 
+            # 2. Datos Operativos (Columna B para etiquetas izquierdas, N para celdas blancas de llenado)
             escribir_celda(ws, "B11", tipo_servicio)
             escribir_celda(ws, "N11", fecha_servicio.strftime("%d/%m/%Y"))
             escribir_celda(ws, "B12", producto)
             escribir_celda(ws, "N12", encargado)
-            escribir_celda(ws, "B13", metodo)
-            escribir_celda(ws, "N13", area_tratada)
 
+            # Ajuste de Método y Área según el servicio seleccionado
+            if tipo_servicio in ["3D", "TRAMPA DE GRASA"]:
+                escribir_celda(ws, "B14", metodo)
+                escribir_celda(ws, "N14", area_tratada)
+            elif tipo_servicio in [
+                "CAMPANA, FILTROS, DUCTO Y MOTOR",
+                "PRESERVANTE DE MADERA",
+            ]:
+                escribir_celda(ws, "B13", metodo)
+                escribir_celda(ws, "N13", area_tratada)
+            else:
+                escribir_celda(ws, "B13", metodo)
+                escribir_celda(ws, "N13", area_tratada)
+
+            # 3. Observaciones, Recomendaciones y Grado de Acción
             escribir_celda(ws, "L21", observaciones)
             escribir_celda(ws, "O21", recomendaciones)
             escribir_celda(ws, "P21", grado_accion)
@@ -443,7 +421,7 @@ if submit_button:
                 wb.save(buffer_excel)
                 buffer_excel.seek(0)
 
-            # --- PUNTO 1: HISTORIAL Y GUARDADO AUTOMÁTICO LOCAL ---
+            # --- HISTORIAL Y GUARDADO AUTOMÁTICO LOCAL ---
             nombre_archivo_limpio = (
                 f"INFORME_{n_informe}_{razon_social.replace(' ', '_')}.xlsx"
             )
@@ -469,7 +447,7 @@ if submit_button:
                     use_container_width=True,
                 )
 
-            # --- PUNTO 4: CONVERSIÓN AUTOMÁTICA A PDF (ReportLab) ---
+            # --- CONVERSIÓN AUTOMÁTICA A PDF (ReportLab) ---
             with col_dl2:
                 try:
                     from reportlab.lib.pagesizes import letter
@@ -516,8 +494,8 @@ if submit_button:
                     )
                 except Exception:
                     st.info(
-                        "💡 Para habilitar la descarga en PDF, ejecuta en tu"
-                        " terminal: `pip install reportlab`"
+                        "💡 Para habilitar la descarga en PDF, ejecuta en tu "
+                        "terminal: `pip install reportlab`"
                     )
 
         except Exception as e:
